@@ -27,12 +27,6 @@ server.post('/api/users', (req,res)=>{
                 })
             })
     }
-    if (user.bio && user.name) {
-    User.insert(user)
-        .then(user => {
-            res.status(201).json(user);
-        })
-    }
 })
 
 server.get('/api/users', (req,res)=>{
@@ -85,7 +79,30 @@ server.delete('/api/users/:id', (req,res) => {
         })
 })
 server.put('/api/users/:id', (req,res) => {
-    User.update()
+    let id = req.params.id;
+    let user = req.body;
+    if (!user.name || !user.bio) {
+        res.status(400).json({
+            message: "Please provide name and bio for the user",
+        })
+    } else {
+    User.update(id, user)
+        .then(updatedUser => {
+            if (!updatedUser) {
+                res.status(404).json({
+                    message: "The user with the specified ID does not exist"
+                })
+            } else {
+                res.status(200).json(updatedUser);
+            }
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "The user information could not be modified",
+                error: error.message
+            })
+        })
+    }
 })
 
 //PUT       /api/users/:id  updates specified user using data from request body. returns modified user
