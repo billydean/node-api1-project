@@ -62,15 +62,27 @@ server.get('/api/users/:id', (req,res)=>{
             res.status(500).json({
                 message: 'The users information could not be retrieved',
                 error: error.message,
-
             })
         })
 })
 
 server.delete('/api/users/:id', (req,res) => {
     User.remove(req.params.id)
-        .then()
-        .catch()
+        .then(deletedUser => {
+            if (!deletedUser) {
+                res.status(404).json({
+                    message: "The user with the specified ID does not exist"
+                })
+            } else {
+                res.json(deletedUser)
+            }
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "The user could not be removed",
+                error: error.message,
+            })
+        })
 })
 server.put('/api/users/:id', (req,res) => {
     User.update()
